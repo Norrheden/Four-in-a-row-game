@@ -4,6 +4,7 @@ let currPlayer = playerRed;
 
 let gameOver = false;
 let board;
+let currColumns;
 
 let rows = 6;
 let columns = 7; 
@@ -14,6 +15,7 @@ window.onload = function(){
 
 function setGame(){
     board = [];
+    currColumns = [5, 5, 5, 5, 5 ,5, 5]
 
     for(let r = 0; r < rows; r++) {
         let row = [];
@@ -41,9 +43,13 @@ function setPice() {
     let coords = this.id.split("-"); // "0-0" -> ["0", "0"]
     let r = parseInt(coords[0]);
     let c = parseInt(coords[1]);
+    r = currColumns[c];
+    if(r < 0) {
+        return;
+    }
     
     board[r][c] = currPlayer;
-    let tile = this;
+    let tile = document.getElementById(r.toString() + "-" + c.toString());
     if (currPlayer == playerRed) {
         tile.classList.add("red-piece")
         currPlayer = playerYellow;
@@ -52,4 +58,34 @@ function setPice() {
         tile.classList.add("yellow-piece");
         currPlayer = playerRed;
     }
+
+    r -= 1;
+    currColumns[c] = r;
+
+    checkWinner();
+}
+
+function checkWinner() {
+    // horizontally
+    for(let r = 0; r < rows; r++) {
+        for(let c = 0; c < columns - 3; c++) {
+            if(board[r][c] != " ") {
+                if(board[r][c] == board[r][c+1] && board[r][c+1] == board[r][c + 2] && board[r][c + 2] == board[r][c + 3]) {
+                    setWinner(r, c);
+                    return;
+                }
+            }
+        }
+    }
+}
+
+function setWinner(r, c) {
+    let winner = document.getElementById("winner");
+    if(board[r][c] == playerRed) {
+        winner.innerText = "Red Wins"
+    } else {
+        winner.innerText = "Yellow Wins" 
+    }
+
+    gameOver = true;
 }
